@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DubStudio.App.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Primary">#2B579A</Color>
+            <Color x:Key="Warn">#B07A1F</Color>
+            <Color x:Key="Danger">#B33A3A</Color>
+            <Color x:Key="Ok">#2E7D32</Color>
+            <Style TargetType="Label">
+                <Setter Property="Margin" Value="0,2" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="Padding" Value="10,6" />
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="Margin" Value="0,3" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

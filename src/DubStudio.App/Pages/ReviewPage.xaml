@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.ReviewPage"
+             Title="待复核队列"
+             x:DataType="vm:ReviewViewModel">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <HorizontalStackLayout Grid.Row="0" Margin="8">
+            <Button Text="刷新" Command="{Binding LoadCommand}" />
+            <Label Text="{Binding StatusText}" VerticalOptions="Center" Margin="10,0"
+                   TextColor="{StaticResource Warn}" />
+        </HorizontalStackLayout>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}"
+                        SelectionMode="Single" Margin="6">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ReviewRow">
+                    <Frame Padding="6" Margin="3">
+                        <VerticalStackLayout>
+                            <Label FontAttributes="Bold">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="{}[{0}] {1}">
+                                        <Binding Path="KindText" />
+                                        <Binding Path="LineCode" />
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
+                            <Label Text="{Binding Item.Message}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <HorizontalStackLayout Grid.Row="2" Margin="8">
+            <Button Text="确认旧录音沿用（条次转可用）" Command="{Binding ConfirmTakeCommand}" />
+            <Button Text="仅标记已处理" Command="{Binding DismissCommand}" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

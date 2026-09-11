@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:DubStudio.App.Pages"
+       x:Class="DubStudio.App.AppShell"
+       FlyoutBehavior="Flyout"
+       Title="译制录音棚工作台">
+    <ShellContent Title="工程" Route="projects" ContentTemplate="{DataTemplate pages:ProjectsPage}" />
+    <ShellContent Title="剧本与口型" Route="script" ContentTemplate="{DataTemplate pages:ScriptPage}" />
+    <ShellContent Title="录音条次" Route="recording" ContentTemplate="{DataTemplate pages:RecordingPage}" />
+    <ShellContent Title="导演选用" Route="director" ContentTemplate="{DataTemplate pages:DirectorPage}" />
+    <ShellContent Title="待复核队列" Route="review" ContentTemplate="{DataTemplate pages:ReviewPage}" />
+    <ShellContent Title="扫描与归档" Route="tools" ContentTemplate="{DataTemplate pages:ToolsPage}" />
+</Shell>

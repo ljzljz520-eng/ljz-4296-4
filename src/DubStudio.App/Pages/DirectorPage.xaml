@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.DirectorPage"
+             Title="导演选用"
+             x:DataType="vm:DirectorViewModel">
+    <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,*">
+        <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Margin="8">
+            <Button Text="刷新" Command="{Binding LoadCommand}" />
+            <Label Text="{Binding StatusText}" VerticalOptions="Center" TextColor="{StaticResource Warn}" Margin="10,0" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Lines}"
+                        SelectedItem="{Binding SelectedLine}" SelectionMode="Single" Margin="6">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:DirectorLineRow">
+                    <Frame Padding="6" Margin="3">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding PickBadge}" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}" />
+                            <Label Text="{Binding Label}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1" Grid.Column="1" Margin="10">
+            <Label Text="{Binding PickInfo}" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Takes}" SelectedItem="{Binding SelectedTake}"
+                            SelectionMode="Single" HeightRequest="260">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DirectorTakeRow">
+                        <Frame Padding="6" Margin="2">
+                            <Label Text="{Binding Summary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding FileMissing}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource Danger}" />
+                                        <Setter Property="Text" Value="文件缺失，不能选用" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <HorizontalStackLayout>
+                <Button Text="采用所选条次" Command="{Binding PickCommand}" />
+                <Button Text="确认复核后沿用" Command="{Binding ConfirmCommand}" />
+                <Button Text="清除选用" Command="{Binding ClearPickCommand}" />
+            </HorizontalStackLayout>
+            <Label Text="只能从实际存在且带交付音频的条次中选择；旧译文录音不会自动沿用。"
+                   TextColor="{StaticResource Warn}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

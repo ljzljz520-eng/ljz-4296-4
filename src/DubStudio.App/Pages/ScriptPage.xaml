@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.ScriptPage"
+             Title="剧本与口型"
+             x:DataType="vm:ScriptViewModel">
+    <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,*">
+        <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Margin="8">
+            <Button Text="导入剧本 (txt/json)" Command="{Binding ImportCommand}" />
+            <Button Text="刷新" Command="{Binding RefreshCommand}" />
+            <Label Text="{Binding ImportInfo}" VerticalOptions="Center" Margin="12,0" />
+            <Label Text="{Binding StatusText}" VerticalOptions="Center" TextColor="{StaticResource Warn}" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Rows}"
+                        SelectedItem="{Binding Selected}" SelectionMode="Single" Margin="6">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:LineRow">
+                    <Frame Padding="6" Margin="3">
+                        <VerticalStackLayout>
+                            <Label FontAttributes="Bold">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="{}{0}  {1}">
+                                        <Binding Path="Code" />
+                                        <Binding Path="StateBadge" />
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
+                            <Label Text="{Binding Original}" />
+                            <Label Text="{Binding TranslatedDraft}" TextColor="{StaticResource Primary}" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ScrollView Grid.Row="1" Grid.Column="1" Margin="10">
+            <VerticalStackLayout Spacing="6">
+                <Label Text="{Binding Selected.Code, FontAttributes=Bold}" FontSize="16" />
+                <Label Text="{Binding Selected.CharacterName, StringFormat='角色：{0}'}" />
+                <Label Text="{Binding Selected.Original, StringFormat='原句：{0}'}" />
+                <Label Text="译文（保存即形成新版本）" />
+                <Editor Text="{Binding Selected.TranslatedDraft}" HeightRequest="90" />
+                <Button Text="保存译文新版本" Command="{Binding SaveTranslationCommand}" />
+
+                <Label Text="口型关键点（毫秒）" FontAttributes="Bold" Margin="0,12,0,0" />
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                    <Label Grid.Row="0" Grid.Column="0" Text="入点 ms" />
+                    <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Selected.InMs}" Keyboard="Numeric" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="闭口点 ms" />
+                    <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Selected.CloseMs}" Keyboard="Numeric" />
+                    <Label Grid.Row="2" Grid.Column="0" Text="重音 ms" />
+                    <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Selected.AccentMs}" Keyboard="Numeric" />
+                    <Label Grid.Row="3" Grid.Column="0" Text="长度上限 ms" />
+                    <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Selected.MaxMs}" Keyboard="Numeric" />
+                </Grid>
+                <HorizontalStackLayout>
+                    <Button Text="保存关键点" Command="{Binding SaveLipSyncCommand}" />
+                    <Button Text="时间码预览" Command="{Binding TimecodeHintCommand}" />
+                </HorizontalStackLayout>
+                <Label Text="VFR 素材以毫秒为权威时间轴；显示帧号按标称帧率换算（29.97/59.94 为丢帧）。"
+                       TextColor="{StaticResource Warn}" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

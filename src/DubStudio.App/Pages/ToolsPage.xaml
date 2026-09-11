@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.ToolsPage"
+             Title="扫描与归档"
+             x:DataType="vm:ToolsViewModel">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <HorizontalStackLayout Grid.Row="0" Margin="8">
+            <Button Text="扫描缺失/外部改动" Command="{Binding ScanCommand}" />
+            <Button Text="工程归档 (.zip)" Command="{Binding ArchiveCommand}" />
+            <CheckBox IsChecked="{Binding IncludeAudio}" VerticalOptions="Center" />
+            <Label Text="包含交付音频" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+        <VerticalStackLayout Grid.Row="1" Margin="10,0">
+            <Label Text="{Binding Summary}" FontAttributes="Bold" />
+            <Label Text="{Binding StatusText}" TextColor="{StaticResource Warn}" />
+        </VerticalStackLayout>
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Issues}" Margin="6">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:IssueRow">
+                    <Label Text="{Binding Text}" Margin="4" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

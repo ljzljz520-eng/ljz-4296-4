@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.ProjectsPage"
+             Title="工程"
+             x:DataType="vm:ProjectsViewModel">
+    <ScrollView>
+        <VerticalStackLayout Margin="20" Spacing="8" MaximumWidthRequest="640">
+            <Label Text="译制录音棚工作台" FontSize="22" FontAttributes="Bold" />
+            <Label Text="工程（SQLite）" FontAttributes="Bold" Margin="0,12,0,0" />
+            <HorizontalStackLayout>
+                <Button Text="新建工程" Command="{Binding CreateCommand}" />
+                <Button Text="打开工程" Command="{Binding OpenCommand}" />
+                <Button Text="关闭" Command="{Binding CloseProjectCommand}" />
+            </HorizontalStackLayout>
+
+            <Label Text="工程名称" />
+            <Entry Text="{Binding ProjectName}" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label Text="帧率（23.976 / 24 / 25 / 29.97 / 30000/1001 / 59.94）" />
+                    <Entry Text="{Binding FpsText}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1">
+                    <Label Text="可变帧率 (VFR)" />
+                    <HorizontalStackLayout>
+                        <CheckBox IsChecked="{Binding Vfr}" VerticalOptions="Center" />
+                        <Label Text="素材为 VFR（以毫秒为准）" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="源媒体" FontAttributes="Bold" Margin="0,12,0,0" />
+            <HorizontalStackLayout>
+                <Button Text="选择并探测媒体…" Command="{Binding BrowseMediaCommand}" />
+            </HorizontalStackLayout>
+            <Label Text="{Binding SourceMedia}" LineBreakMode="TailTruncation" />
+            <Label Text="{Binding MediaSummary}" TextColor="{StaticResource Primary}" />
+
+            <Label Text="状态" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Label Text="{Binding StatusText}" TextColor="{StaticResource Warn}" />
+            <Label Text="说明：媒体解码全部通过独立 ffmpeg/ffprobe 进程完成，请在系统中安装并加入 PATH。"
+                   TextColor="Gray" Margin="0,12,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

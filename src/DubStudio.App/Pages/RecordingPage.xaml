@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             x:Class="DubStudio.App.Pages.RecordingPage"
+             Title="录音条次"
+             x:DataType="vm:RecordingViewModel">
+    <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,*">
+        <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding StatusText}"
+               TextColor="{StaticResource Warn}" Margin="10" />
+
+        <CollectionView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Takes}"
+                        SelectedItem="{Binding SelectedTake}" SelectionMode="Single" Margin="6">
+            <CollectionView.HeaderTemplate>
+                <DataTemplate><Label Text="该句条次" FontAttributes="Bold" /></DataTemplate>
+            </CollectionView.HeaderTemplate>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:TakeRow">
+                    <Frame Padding="6" Margin="3">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Summary}" FontAttributes="Bold" />
+                            <Label Text="{Binding Status}" TextColor="{StaticResource Primary}" />
+                            <Label Text="{Binding Audio}" LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding Note}" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ScrollView Grid.Row="1" Grid.Column="1" Margin="10">
+            <VerticalStackLayout Spacing="6">
+                <Label Text="选择台词" />
+                <Picker ItemsSource="{Binding Lines}" SelectedItem="{Binding SelectedLine}" />
+
+                <Label Text="演员" /><Entry Text="{Binding Actor}" />
+                <Label Text="麦克风" /><Entry Text="{Binding Microphone}" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="开始 ms" /><Entry Text="{Binding StartMs}" Keyboard="Numeric" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="结束 ms" /><Entry Text="{Binding EndMs}" Keyboard="Numeric" />
+                    </VerticalStackLayout>
+                </Grid>
+                <Label Text="音频文件（自动记录 SHA-256 摘要）" />
+                <Grid ColumnDefinitions="3*,Auto">
+                    <Entry Grid.Column="0" Text="{Binding AudioPath}" />
+                    <Button Grid.Column="1" Text="浏览…" Command="{Binding BrowseAudioCommand}" />
+                </Grid>
+                <Label Text="现场备注" /><Editor Text="{Binding Note}" HeightRequest="70" />
+                <HorizontalStackLayout>
+                    <Button Text="保存条次" Command="{Binding SaveTakeCommand}" />
+                    <Button Text="标记可用" Command="{Binding MarkUsableCommand}" />
+                    <Button Text="否决条次" Command="{Binding RejectTakeCommand}" BackgroundColor="{StaticResource Danger}" />
+                </HorizontalStackLayout>
+                <Label Text="台词若处于移位/换句待复核，新条次默认待复核；超过长度限制也会提示。"
+                       TextColor="{StaticResource Warn}" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
