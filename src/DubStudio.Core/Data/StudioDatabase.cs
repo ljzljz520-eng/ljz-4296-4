@@ -53,6 +53,11 @@ public sealed class StudioDatabase : IDisposable
             Conn.CreateTable<DirectorPick>();
             Conn.CreateTable<ReviewItem>();
             Conn.CreateTable<MediaSource>();
+            Conn.CreateTable<RevisionPackage>();
+            Conn.CreateTable<RevisionChange>();
+            Conn.CreateTable<LineGenealogy>();
+            Conn.CreateTable<CharacterCast>();
+            Conn.CreateTable<MixDelivery>();
             // 业务唯一约束
             ExecUnique("Episode", "ProjectId,StableKey");
             ExecUnique("Scene", "ProjectId,StableKey");

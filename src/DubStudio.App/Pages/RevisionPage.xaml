@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DubStudio.App.ViewModels"
+             xmlns:core="clr-namespace:DubStudio.Core.Models;assembly=DubStudio.Core"
+             x:Class="DubStudio.App.Pages.RevisionPage"
+             Title="混录后修订"
+             x:DataType="vm:RevisionViewModel">
+    <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,*">
+        <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Margin="8">
+            <Button Text="提交新稿并分析" Command="{Binding AnalyzeCommand}" />
+            <Button Text="刷新" Command="{Binding LoadCommand}" />
+            <Label Text="{Binding StatusText}" VerticalOptions="Center" Margin="10,0"
+                   TextColor="{StaticResource Warn}" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Packages}"
+                        SelectedItem="{Binding SelectedPackage}" SelectionMode="Single" Margin="6">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:PackageRow">
+                    <Frame Padding="6" Margin="3">
+                        <Label Text="{Binding Title}" />
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto" Margin="10">
+            <Label Text="{Binding Summary}" FontAttributes="Bold" />
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Changes}"
+                            SelectedItem="{Binding SelectedChange}" SelectionMode="Single" Margin="0,6">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ChangeRow">
+                        <Frame Padding="6" Margin="2">
+                            <VerticalStackLayout>
+                                <Label FontAttributes="Bold">
+                                    <Label.Text>
+                                        <MultiBinding StringFormat="{}[{0}] {1} → {2}">
+                                            <Binding Path="KindText" />
+                                            <Binding Path="LineCode" />
+                                            <Binding Path="DispositionText" />
+                                        </MultiBinding>
+                                    </Label.Text>
+                                </Label>
+                                <Label Text="{Binding Change.SuggestionBasis}" FontSize="Small" />
+                                <Label Text="{Binding Change.DecisionBasis}" FontSize="Small"
+                                       TextColor="{StaticResource Primary}" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <VerticalStackLayout Grid.Row="2" Margin="0,6">
+                <Label Text="逐条处置依据（与建议不同或为保留时必填）：" FontSize="Small" />
+                <HorizontalStackLayout>
+                    <Entry Placeholder="保存依据" WidthRequest="260" Text="{Binding DecisionBasis}" />
+                    <Button Text="需补录"
+                            Command="{Binding DecideCommand}"
+                            CommandParameter="{x:Static core:LineDisposition.NeedsRerecord}" />
+                    <Button Text="仅重剪"
+                            Command="{Binding DecideCommand}"
+                            CommandParameter="{x:Static core:LineDisposition.ReeditOnly}" />
+                    <Button Text="可以保留"
+                            Command="{Binding DecideCommand}"
+                            CommandParameter="{x:Static core:LineDisposition.Keep}" />
+                    <Button Text="退役删句"
+                            Command="{Binding DecideCommand}"
+                            CommandParameter="{x:Static core:LineDisposition.Retire}" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Margin="0,6">
+                    <Entry Placeholder="批量判断依据（必填，将随每条保存）"
+                           WidthRequest="320" Text="{Binding BatchBasis}" />
+                    <Button Text="批量按建议圈定" Command="{Binding BatchApplyCommand}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Grid.Row="3" Margin="0,8">
+                <Button Text="确认修订包" Command="{Binding ConfirmCommand}" BackgroundColor="{StaticResource Primary}" />
+                <Button Text="撤回修订包" Command="{Binding WithdrawCommand}" />
+                <Button Text="导出修订包（新目录，不覆盖混音文件）" Command="{Binding DeliverCommand}" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

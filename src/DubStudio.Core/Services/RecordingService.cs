@@ -39,9 +39,21 @@ public sealed class RecordingService
             size = new FileInfo(req.AudioFilePath!).Length;
         }
 
-        // 台词处于移位/换句待复核状态时，新条次默认也需复核，避免误配
+        // 台词处于移位/换句待复核状态时，新条次默认也需复核，避免误配。
+        // 换演员复核项属于旧演员条次，不应阻止新演员的新批次录音。
+        var openReviews = _db.Conn.Table<ReviewItem>()
+            .Where(r => r.LineId == req.LineId && !r.Resolved).ToList();
         var needsReview = line.LipSyncDirty ||
-                          _db.Conn.Table<ReviewItem>().Any(r => r.LineId == req.LineId && !r.Resolved);
+                          openReviews.Any(r => r.Kind != ReviewKind.ActorChanged);
+
+        // 角色已换演员：以历史演员名义录入的新条次不允许混入新批次，入待复核
+        string? castWarning = null;
+        var cast = new CastService(_db).GetCast(line.ProjectId, line.CharacterId);
+        if (cast != null && !string.IsNullOrWhiteSpace(req.Actor) && req.Actor.Trim() != cast.Actor)
+        {
+            needsReview = true;
+            castWarning = $"演员“{req.Actor.Trim()}”不是角色当前演员“{cast.Actor}”：历史录音保留，但该条不得混入新批次";
+        }
 
         var take = new Take
         {
@@ -55,11 +67,14 @@ public sealed class RecordingService
             AudioFilePath = req.AudioFilePath,
             FileSha256 = hash,
             FileSizeBytes = size,
-            Note = req.Note,
+            Note = string.IsNullOrEmpty(castWarning) ? req.Note : $"{req.Note}｜{castWarning}",
             Status = needsReview ? TakeStatus.NeedsReview : TakeStatus.Usable,
             RecordedAt = ReviewWorkflow.Now()
         };
         _db.Conn.Insert(take);
+
+        if (castWarning != null)
+            ReviewWorkflow.QueueReview(_db.Conn, req.LineId, take.Id, ReviewKind.ActorChanged, castWarning);
 
         if (line.MaxDurationMs is > 0 && req.EndMs - req.StartMs > line.MaxDurationMs)
         {

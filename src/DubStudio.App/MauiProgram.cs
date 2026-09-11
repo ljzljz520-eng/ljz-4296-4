@@ -35,6 +35,8 @@ public static class MauiProgram
         builder.Services.AddTransient<RecordingPage>();
         builder.Services.AddTransient<DirectorViewModel>();
         builder.Services.AddTransient<DirectorPage>();
+        builder.Services.AddTransient<RevisionViewModel>();
+        builder.Services.AddTransient<RevisionPage>();
         builder.Services.AddTransient<ReviewViewModel>();
         builder.Services.AddTransient<ReviewPage>();
         builder.Services.AddTransient<ToolsViewModel>();

@@ -1,0 +1,47 @@
+{
+  "episodeCode": "E01",
+  "timelineShiftMs": 0,
+  "reason": "客户混录后改稿：村口重逢段台词调整",
+  "submittedBy": "译配编辑",
+  "scenes": [
+    {
+      "code": "S001",
+      "lines": [
+        {
+          "character": "田中",
+          "qualifier": "少年",
+          "text": "你终于回来了。",
+          "translatedText": "你可算回来了。"
+        },
+        {
+          "character": "田中",
+          "qualifier": "少年",
+          "text": "这些年你都去了哪里？",
+          "inPointMs": 2000,
+          "mouthCloseMs": 4200,
+          "maxDurationMs": 2300
+        },
+        {
+          "character": "铃木",
+          "text": "说来话长。"
+        },
+        {
+          "character": "铃木",
+          "text": "路上我还遇到了熟人。",
+          "translatedText": "路上我还碰到了个熟人。"
+        }
+      ]
+    },
+    {
+      "code": "S002",
+      "slug": "河边·黄昏",
+      "lines": [
+        {
+          "character": "田中",
+          "qualifier": "老年",
+          "text": "河水还是老样子。"
+        }
+      ]
+    }
+  ]
+}

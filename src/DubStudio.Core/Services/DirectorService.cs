@@ -51,6 +51,10 @@ public sealed class DirectorService
         var pick = _db.Conn.Table<DirectorPick>().FirstOrDefault(p => p.LineId == lineId)
                    ?? throw new InvalidOperationException("该台词尚无选用");
         var take = _db.Conn.Find<Take>(pick.TakeId) ?? throw new InvalidOperationException("选用条次已不存在");
+        if (take.Status == TakeStatus.Rejected)
+            throw new InvalidOperationException("选用条次已被否决，不能确认");
+        if (string.IsNullOrWhiteSpace(take.AudioFilePath) || !File.Exists(take.AudioFilePath))
+            throw new InvalidOperationException("选用条次缺少交付音频，不能确认");
         ReviewWorkflow.ConfirmTakeAfterReview(_db.Conn, take.Id);
         pick.Status = PickStatus.Confirmed;
         pick.UpdatedAt = ReviewWorkflow.Now();

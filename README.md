@@ -12,6 +12,7 @@ DubStudio.sln
 │   ├── Data/                 # StudioDatabase（一工程一 .dsproj 数据库）
 │   ├── Import/               # 剧本解析（txt/json）与导入模型
 │   ├── Services/             # 导入、译文版本、录音条次、导演选用、扫描、归档
+│   ├── Services/Revision*    # 混录后修订：影响分析、拆分合并、撤回、修订包交付、交叉测试
 │   ├── Media/                # FFmpeg 独立进程、VFR 检测、文件摘要
 │   └── Timecode/             # 帧率与 SMPTE 时间码（含 29.97/59.94 丢帧）
 ├── src/DubStudio.App         # MAUI 桌面端（WinUI / Mac Catalyst）
@@ -56,6 +57,39 @@ dotnet build src/DubStudio.App/DubStudio.App.csproj -f net8.0-maccatalyst
 | 重名角色 | 同名无限定视为同一人；`角色@限定` 生成不同稳定码，导入时给出重名警告 |
 | 外部文件改动测试 | 录音存 SHA-256/大小，扫描发现外部覆写即入复核（见测试） |
 
+## 混录后剧本修订（修订包）
+
+已进入混录后，译配编辑通过 `RevisionDraft`（JSON/文本，见 `samples/episode01.rev.json`）提交新稿。
+`RevisionPackageService.Analyze` 按**稳定语句身份**（集|场|角色|原文哈希|出现序；原文改写时用
+字符二元组相似度兜底识别“文字微调”而非误判删/增）把每条差异圈为：
+
+| 差异类型 | 默认圈定处置 | 说明 |
+| --- | --- | --- |
+| 文字微调 `TextTweak` | 需补录 | 译文/原文变了，旧录音念的是旧词 |
+| 时长变化 `DurationChanged` | 仅需重剪 | 入点/闭口点/长度限制变，文字未变，录音可沿用 |
+| 文字+时长 `TextAndDuration` | 需补录 | 两者同时变化 |
+| 删句 `Deleted` | 退役删句 | 稳定身份在新稿消失，录音保留但不再交付 |
+| 新增句 `Added` | 等待补录 | 无历史录音的新身份 |
+| 拆分 `Split` / 合并 `Merged` | 源句补录/新片段补录/合并句重剪 | 显式操作，写入 `LineGenealogy` 血缘 |
+
+- **声音导演逐条确认处置**：`SetDisposition`；与系统建议不同（含“可以保留”）必须填写**保存依据**。
+- **批量判断也要展开保存依据**：`ApplySuggestedDispositions(pkg, 依据)` 把未决定项按建议圈定，
+  每条落 `DecisionBasis = 批量：<依据>（系统建议…）`，已逐条决定的不被覆盖。
+- **分析阶段不动在制数据**；`ConfirmPackage` 要求全部条目已决定，才把译文版本/时序/退役/平移落库，
+  旧条次按处置转“需补录（待复核）”，重剪条次保留录音并入复核，保留项关闭影响。
+- **时间轴整体平移**：`RevisionDraft.TimelineShiftMs` 平移关键点与条次时间段，圈定为“仅需重剪”。
+- **修订撤回** `WithdrawPackage`：草案撤回仅清分析；已确认/已交付撤回按逐条快照恢复译文版本、
+  时序、句状态、条次/选用状态并回收本包复核项；已生成的交付目录**保留**作追溯，只能用新修订包重新交付。
+- **已交混音不原位替换**：`RevisionDeliveryService` 每次交付写独立目录 `REV-n_vN/`，
+  复制当前有效音频并附 `changelist.json` / `changelist.txt`（逐条差异、处置、依据、新旧文、被挡条次）。
+- **角色换演员** `CastService.SetActor`：历史录音全部保留；旧演员条次入复核且
+  `IsCurrentActor=false`，交付修订包时计入 `CastBlocked` 绝不混入新批次；以旧演员名义新录也自动入复核。
+- **两个修订包交叉测试** `RevisionCrossCheckService.CrossCheck`：按身份找出退役/保留硬冲突、
+  拆分合并结构冲突与“一个补录一个重剪”等软警告。
+
+数据模型新增 `RevisionPackage / RevisionChange / LineGenealogy / CharacterCast / MixDelivery`，
+`ReviewItem.PackageId` 归属修订包；老数据库打开时由 `CreateTable` 自动补齐新列。
+
 ## 时间码与 VFR
 
 - 内部全部用毫秒存储关键点和条次时间段，避免 VFR 下帧号漂移。
@@ -90,3 +124,6 @@ SCENE S001 场景标记
 - FFmpeg：用假进程执行器验证独立进程参数、成功哈希输出与失败报错
 - 交付音频缺失、外部覆写（SHA-256 变化）入复核
 - 归档内容、往返重开、缺/改文件计数、仅数据库归档
+- 混录后修订：稳定身份四分类（微调/时长/删/增）、模糊改写识别、导演逐条与批量保存依据、
+  确认生效、拆分/合并血缘、时间轴整体平移、草案/已确认/已交付撤回快照回退、
+  修订包非破坏式交付（独立 REV-n_vN 目录 + 变更清单）、换演员历史录音隔离、两个修订包交叉测试

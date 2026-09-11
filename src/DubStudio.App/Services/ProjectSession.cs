@@ -46,4 +46,7 @@ public sealed class ProjectSession
     public DirectorService Director() => new(Require());
     public AudioScanService Scan() => new(Require());
     public ArchiveService Archive() => new(Require());
+    public CastService Cast() => new(Require());
+    public RevisionPackageService Revisions() => new(Require());
+    public RevisionDeliveryService RevisionDelivery() => new(Require());
 }
